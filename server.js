@@ -132,8 +132,11 @@ async function fetchDataAndSave() {
       });
       await page.goto(
         "https://core-api.prod.blur.io/v1/blend/active-liens/0xbd3531da5cf5857e7cfaa92426877b022e612cf8",
-        { waitUntil: "networkidle0" }
+        { waitUntil: "networkidle2" }
       );
+      console.log("this 1");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log("this");
       // Extracting JSON data directly
       const jsonContent = await page.evaluate(() => document.body.innerText);
 
