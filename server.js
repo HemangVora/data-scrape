@@ -131,8 +131,7 @@ async function fetchDataAndSave() {
         isMobile: false,
       });
       await page.goto(
-        "https://core-api.prod.blur.io/v1/blend/active-liens/0xbd3531da5cf5857e7cfaa92426877b022e612cf8",
-        { waitUntil: "networkidle2" }
+        "https://core-api.prod.blur.io/v1/blend/active-liens/0xbd3531da5cf5857e7cfaa92426877b022e612cf8"
       );
       console.log("this 1");
       await new Promise((resolve) => setTimeout(resolve, 2000));
