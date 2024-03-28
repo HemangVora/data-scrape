@@ -23,8 +23,8 @@ const ApiResponse = mongoose.model("ApiResponse", ApiResponseSchema);
 
 const options = {
   headers: {
-    Accept:
-      "application/xml,application/xhtml+xml,text/html;q=0.9, text/plain;q=0.8,image/png,*/*;q=0.5",
+    Accept: "*/*",
+    "Cache-Control": "private",
 
     "accept-Encoding": "gzip, deflate, br, zstd",
     "content-type": "application/x-www-form-urlencoded",
@@ -42,7 +42,7 @@ const options = {
     "sec-fetch-mode": "cors",
     "sec-fetch-site": "same-site",
     "User-Agent":
-      "Ubuntu Chromium/34.0.1847.116 Chrome/34.0.1847.116 Safari/537.36",
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
   },
   cloudflareTimeout: 5000,
   // Reduce Cloudflare's timeout to cloudflareMaxTimeout if it is excessive
@@ -69,24 +69,25 @@ async function fetchDataAndSave() {
       .then(async function (data) {
         const apiResponse = new ApiResponse({ data: data });
         await apiResponse.save();
+        console.log("Data saved to MongoDB");
       })
       .catch(function (err) {
         console.log(err);
       });
-
-    console.log("Data saved to MongoDB");
   } catch (error) {
     console.error("Error:", error);
   }
 }
+
 app.get("/get", async (req, res) => {
   const apiResponse = await ApiResponse.find({});
-  console.log(apiResponse);
+  // console.log(apiResponse);
   return res.json({ apiResponse });
 });
 // Call fetchDataAndSave every 5 minutes
 setInterval(fetchDataAndSave, 5 * 60 * 1000);
-fetchDataAndSave();
+
 app.listen(PORT, () => {
+  fetchDataAndSave();
   console.log(`Server running on port ${PORT}`);
 });
