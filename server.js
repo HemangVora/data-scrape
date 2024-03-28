@@ -3,10 +3,13 @@ dotenv.config();
 import cloudscraper from "cloudscraper";
 import express from "express";
 import mongoose from "mongoose";
-// import puppeteer from "puppeteer-extra";
-// import StealthPlugin from "puppeteer-extra-plugin-stealth";
-// puppeteer.use(StealthPlugin());
+import puppeteer from "puppeteer-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import cloudflareScraper from "cloudflare-scraper";
+
+puppeteer.use(StealthPlugin());
 import { exec } from "child_process";
+import { executablePath } from "puppeteer";
 const curlCommand = `curl 'https://core-api.prod.blur.io/v1/blend/active-liens/0xbd3531da5cf5857e7cfaa92426877b022e612cf8' \
   -H 'accept: */*' \
   -H 'accept-language: en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7' \
@@ -76,8 +79,8 @@ const options = {
   // Support gzip encoded responses (Should be enabled unless using custom headers)
   gzip: true,
 
-  uri: "https://104.18.10.49:443/v1/blend/active-liens/0xbd3531da5cf5857e7cfaa92426877b022e612cf8",
-  // url: "https://core-api.prod.blur.io/v1/blend/active-liens/0xbd3531da5cf5857e7cfaa92426877b022e612cf8",
+  // uri: "https://104.18.10.49:443/v1/blend/active-liens/0xbd3531da5cf5857e7cfaa92426877b022e612cf8",
+  url: "https://core-api.prod.blur.io/v1/blend/active-liens/0xbd3531da5cf5857e7cfaa92426877b022e612cf8",
   method: "GET",
   timeout: {
     send: 5000,
@@ -86,24 +89,49 @@ const options = {
 
 async function fetchDataAndSave() {
   try {
-    exec(curlCommand, async (error, stdout, stderr) => {
-      if (error) {
-        console.error(`exec error: ${error}`);
-        return;
+    // exec(curlCommand, async (error, stdout, stderr) => {
+    //   if (error) {
+    //     console.error(`exec error: ${error}`);
+    //     return;
+    //   }
+    //   if (stderr) {
+    //     console.log(`Response: ${stdout}`);
+    //     let apiresp = JSON.parse(stdout);
+    //     const apiResponse = new ApiResponse({ data: apiresp });
+    //     await apiResponse.save();
+    //     console.log("Data saved to MongoDB");
+    //     return;
+    //   }
+    //   // Output the response from your curl command
+    //   console.log(`Response: ${stdout}`);
+    // });
+    puppeteer.launch({ headless: true }).then(async (browser) => {
+      console.log("we are reasy to rock and roll");
+      const page = await browser.newPage();
+      //to add view port
+      await page.setViewport({
+        width: 1920 + Math.floor(Math.random() * 100),
+        height: 3000 + Math.floor(Math.random() * 100),
+        deviceScaleFactor: 1,
+        hasTouch: false,
+        isLandscape: false,
+        isMobile: false,
+      });
+      await page.goto(
+        "https://core-api.prod.blur.io/v1/blend/active-liens/0xbd3531da5cf5857e7cfaa92426877b022e612cf8",
+        { waitUntil: "networkidle0" }
+      );
+      // Extracting JSON data directly
+      const jsonContent = await page.evaluate(() => document.body.innerText);
+
+      // Optionally, parse the JSON to ensure it's valid and perhaps to manipulate it before saving
+      try {
+        const jsonData = JSON.parse(jsonContent);
+        console.log(jsonData);
+        console.log("JSON data has been saved.");
+      } catch (error) {
+        console.error("Failed to parse JSON data:", error);
       }
-
-      if (stderr) {
-        console.log(`Response: ${stdout}`);
-
-        let apiresp = JSON.parse(stdout);
-        const apiResponse = new ApiResponse({ data: apiresp });
-        await apiResponse.save();
-        console.log("Data saved to MongoDB");
-        return;
-      }
-
-      // Output the response from your curl command
-      console.log(`Response: ${stdout}`);
     });
     // cloudscraper(options)
     //   .then(async function (data) {
