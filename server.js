@@ -136,7 +136,7 @@ async function fetchDataAndSave() {
       console.log("this 1");
       await new Promise((resolve) => setTimeout(resolve, 10000));
       console.log("this");
-      console.log(document.body);
+
       // Extracting JSON data directly
 
       const jsonContent = await page.evaluate(() => document.body.innerText);
