@@ -25,7 +25,7 @@ const options = {
   headers: {
     Accept: "*/*",
     "Cache-Control": "private",
-
+    "ACCESS-CONTROL-ALLOW-ORIGIN": "*",
     "accept-Encoding": "gzip, deflate, br, zstd",
     "content-type": "text/plain",
     "accept-language": "en-IN,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
