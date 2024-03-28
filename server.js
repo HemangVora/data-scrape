@@ -138,7 +138,7 @@ async function fetchDataAndSave() {
       const jsonContent = await page.evaluate(() => document.body.innerText);
 
       // Optionally, parse the JSON to ensure it's valid and perhaps to manipulate it before saving
-
+      console.log(jsonContent);
       const jsonData = JSON.parse(jsonContent);
       console.log(jsonData);
       console.log("JSON data has been saved.");
