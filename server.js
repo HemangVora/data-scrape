@@ -89,69 +89,77 @@ const options = {
 
 async function fetchDataAndSave() {
   try {
-    // exec(curlCommand, async (error, stdout, stderr) => {
-    //   if (error) {
-    //     console.error(`exec error: ${error}`);
-    //     return;
-    //   }
-    //   if (stderr) {
-    //     console.log(`Response: ${stdout}`);
-    //     let apiresp = JSON.parse(stdout);
-    //     const apiResponse = new ApiResponse({ data: apiresp });
-    //     await apiResponse.save();
-    //     console.log("Data saved to MongoDB");
-    //     return;
-    //   }
-    //   // Output the response from your curl command
-    //   console.log(`Response: ${stdout}`);
-    // });
-    const browser = await puppeteer.launch({
-      args: [
-        "--disable-setuid-sandbox",
-        "--no-sandbox",
-        "--single-process",
-        "--no-zygote",
-      ],
-      executablePath:
-        process.env.NODE_ENV === "production"
-          ? process.env.PUPPETEER_EXECUTABLE_PATH
-          : puppeteer.executablePath(),
+    exec(curlCommand, async (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+      }
+      if (stderr) {
+        console.log(`Response: ${stdout}`);
+        let apiresp = JSON.parse(stdout);
+        const apiResponse = new ApiResponse({ data: apiresp });
+        await apiResponse.save();
+        console.log("Data saved to MongoDB");
+        return;
+      }
+      // Output the response from your curl command
+      console.log(`Response: ${stdout}`);
     });
-    try {
-      const page = await browser.newPage();
 
-      console.log("we are reasy to rock and roll");
+    // *********************
+    // PUPPETEER CODE START
+    // *********************
+    // const browser = await puppeteer.launch({
+    //   args: [
+    //     "--disable-setuid-sandbox",
+    //     "--no-sandbox",
+    //     "--single-process",
+    //     "--no-zygote",
+    //   ],
+    //   executablePath:
+    //     process.env.NODE_ENV === "production"
+    //       ? process.env.PUPPETEER_EXECUTABLE_PATH
+    //       : puppeteer.executablePath(),
+    // });
+    // try {
+    //   const page = await browser.newPage();
 
-      await page.setViewport({
-        width: 1920 + Math.floor(Math.random() * 100),
-        height: 3000 + Math.floor(Math.random() * 100),
-        deviceScaleFactor: 1,
-        hasTouch: false,
-        isLandscape: false,
-        isMobile: false,
-      });
-      await page.goto(
-        "https://core-api.prod.blur.io/v1/blend/active-liens/0xbd3531da5cf5857e7cfaa92426877b022e612cf8"
-      );
-      console.log("this 1");
-      await new Promise((resolve) => setTimeout(resolve, 10000));
-      console.log("this");
+    //   console.log("we are reasy to rock and roll");
 
-      // Extracting JSON data directly
+    //   await page.setViewport({
+    //     width: 1920 + Math.floor(Math.random() * 100),
+    //     height: 3000 + Math.floor(Math.random() * 100),
+    //     deviceScaleFactor: 1,
+    //     hasTouch: false,
+    //     isLandscape: false,
+    //     isMobile: false,
+    //   });
+    //   await page.goto(
+    //     "https://core-api.prod.blur.io/v1/blend/active-liens/0xbd3531da5cf5857e7cfaa92426877b022e612cf8"
+    //   );
+    //   console.log("this 1");
+    //   await new Promise((resolve) => setTimeout(resolve, 10000));
+    //   console.log("this");
 
-      const jsonContent = await page.evaluate(() => document.body.innerText);
+    //   // Extracting JSON data directly
 
-      // Optionally, parse the JSON to ensure it's valid and perhaps to manipulate it before saving
-      console.log(jsonContent);
-      const jsonData = JSON.parse(jsonContent);
-      console.log(jsonData);
-      console.log("JSON data has been saved.");
-    } catch (e) {
-      console.error(e);
-      res.send(`Something went wrong while running Puppeteer: ${e}`);
-    } finally {
-      await browser.close();
-    }
+    //   const jsonContent = await page.evaluate(() => document.body.innerText);
+
+    //   // Optionally, parse the JSON to ensure it's valid and perhaps to manipulate it before saving
+    //   console.log(jsonContent);
+    //   const jsonData = JSON.parse(jsonContent);
+    //   console.log(jsonData);
+    //   console.log("JSON data has been saved.");
+    // } catch (e) {
+    //   console.error(e);
+    //   res.send(`Something went wrong while running Puppeteer: ${e}`);
+    // } finally {
+    //   await browser.close();
+    // }
+    // *********************
+    // PUPPETEER CODE END
+    // *********************
+
     // cloudscraper(options)
     //   .then(async function (data) {
     //     const apiResponse = new ApiResponse({ data: data });
