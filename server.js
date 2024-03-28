@@ -134,9 +134,11 @@ async function fetchDataAndSave() {
         "https://core-api.prod.blur.io/v1/blend/active-liens/0xbd3531da5cf5857e7cfaa92426877b022e612cf8"
       );
       console.log("this 1");
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 10000));
       console.log("this");
+      console.log(document.body);
       // Extracting JSON data directly
+
       const jsonContent = await page.evaluate(() => document.body.innerText);
 
       // Optionally, parse the JSON to ensure it's valid and perhaps to manipulate it before saving
