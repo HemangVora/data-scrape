@@ -105,9 +105,23 @@ async function fetchDataAndSave() {
     //   // Output the response from your curl command
     //   console.log(`Response: ${stdout}`);
     // });
-    puppeteer.launch({ headless: true }).then(async (browser) => {
-      console.log("we are reasy to rock and roll");
+    const browser = await puppeteer.launch({
+      args: [
+        "--disable-setuid-sandbox",
+        "--no-sandbox",
+        "--single-process",
+        "--no-zygote",
+      ],
+      executablePath:
+        process.env.NODE_ENV === "production"
+          ? process.env.PUPPETEER_EXECUTABLE_PATH
+          : puppeteer.executablePath(),
+    });
+    try {
       const page = await browser.newPage();
+
+      console.log("we are reasy to rock and roll");
+
       //to add view port
       await page.setUserAgent(
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36"
@@ -128,14 +142,16 @@ async function fetchDataAndSave() {
       const jsonContent = await page.evaluate(() => document.body.innerText);
 
       // Optionally, parse the JSON to ensure it's valid and perhaps to manipulate it before saving
-      try {
-        const jsonData = JSON.parse(jsonContent);
-        console.log(jsonData);
-        console.log("JSON data has been saved.");
-      } catch (error) {
-        console.error("Failed to parse JSON data:", error);
-      }
-    });
+
+      const jsonData = JSON.parse(jsonContent);
+      console.log(jsonData);
+      console.log("JSON data has been saved.");
+    } catch (e) {
+      console.error(e);
+      res.send(`Something went wrong while running Puppeteer: ${e}`);
+    } finally {
+      await browser.close();
+    }
     // cloudscraper(options)
     //   .then(async function (data) {
     //     const apiResponse = new ApiResponse({ data: data });
