@@ -33,7 +33,7 @@ mongoose
   .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log("Connected to MongoDB");
-    fetchDataAndSave();
+    // fetchDataAndSave();
   })
   .catch((err) => console.error("MongoDB connection error:", err));
 
@@ -160,6 +160,16 @@ async function fetchDataAndSave() {
 
 app.get("/get", async (req, res) => {
   const apiResponse = await ApiResponse.find({});
+  // console.log(apiResponse);
+  return res.json({ apiResponse });
+});
+app.get("/get/scrapingant", async (req, res) => {
+  const apiResponse = await ApiResponseScrapingAnt.find({});
+  // console.log(apiResponse);
+  return res.json({ apiResponse });
+});
+app.get("/get/zenrows", async (req, res) => {
+  const apiResponse = await ApiResponseZenrows.find({});
   // console.log(apiResponse);
   return res.json({ apiResponse });
 });
