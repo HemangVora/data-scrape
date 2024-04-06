@@ -66,50 +66,50 @@ const ApiMetrixSchema = new mongoose.Schema({
 const ApiMetrix = mongoose.model("ApiMetrix", ApiMetrixSchema);
 
 async function fetchDataAndSave() {
-  console.log("starting to execute zenrows");
-  const url =
-    "https://core-api.prod.blur.io/v1/blend/active-liens/0xbd3531da5cf5857e7cfaa92426877b022e612cf8";
-  const apikey = "c77bc7ac5fa9dd3d8bb63e1f9b304c2e66f72940";
-  axios({
-    url: "https://api.zenrows.com/v1/",
-    method: "GET",
-    params: {
-      url: url,
-      apikey: apikey,
-      autoparse: "true",
-    },
-  })
-    .then(async (response) => {
-      console.log(response.status);
-      const apiResponse = new ApiResponseZenrows({ data: response.data });
-      await apiResponse.save();
+  // console.log("starting to execute zenrows");
+  // const url =
+  //   "https://core-api.prod.blur.io/v1/blend/active-liens/0xbd3531da5cf5857e7cfaa92426877b022e612cf8";
+  // const apikey = "c77bc7ac5fa9dd3d8bb63e1f9b304c2e66f72940";
+  // axios({
+  //   url: "https://api.zenrows.com/v1/",
+  //   method: "GET",
+  //   params: {
+  //     url: url,
+  //     apikey: apikey,
+  //     autoparse: "true",
+  //   },
+  // })
+  //   .then(async (response) => {
+  //     console.log(response.status);
+  //     const apiResponse = new ApiResponseZenrows({ data: response.data });
+  //     await apiResponse.save();
 
-      let zenrow = await ApiMetrix.findOne({ name: "zenrows" });
-      if (!zenrow) {
-        const ApiMetrixresp = new ApiMetrix({
-          name: "zenrows",
-          success_req_count: "1",
-          total_req_count: "1",
-          status_code_arr: [{ code: response.status, id: "1" }],
-        });
-        await ApiMetrixresp.save();
-      } else {
-        zenrow.total_req_count = parseInt(zenrow.total_req_count) + 1;
-        zenrow.success_req_count = parseInt(zenrow.success_req_count) + 1;
-        zenrow.status_code_arr.push({
-          code: response.status,
-          id: zenrow.total_req_count,
-        });
-        await zenrow.save();
-      }
-      console.log("zenrows executed successfully");
-    })
-    .catch(async (error) => {
-      console.log(error);
-      let zenrow = await ApiMetrix.findOne({ name: "zenrows" });
-      zenrow.total_req_count = parseInt(zenrow.total_req_count) + 1 + "";
-      await zenrow.save();
-    });
+  //     let zenrow = await ApiMetrix.findOne({ name: "zenrows" });
+  //     if (!zenrow) {
+  //       const ApiMetrixresp = new ApiMetrix({
+  //         name: "zenrows",
+  //         success_req_count: "1",
+  //         total_req_count: "1",
+  //         status_code_arr: [{ code: response.status, id: "1" }],
+  //       });
+  //       await ApiMetrixresp.save();
+  //     } else {
+  //       zenrow.total_req_count = parseInt(zenrow.total_req_count) + 1;
+  //       zenrow.success_req_count = parseInt(zenrow.success_req_count) + 1;
+  //       zenrow.status_code_arr.push({
+  //         code: response.status,
+  //         id: zenrow.total_req_count,
+  //       });
+  //       await zenrow.save();
+  //     }
+  //     console.log("zenrows executed successfully");
+  //   })
+  //   .catch(async (error) => {
+  //     console.log(error);
+  //     let zenrow = await ApiMetrix.findOne({ name: "zenrows" });
+  //     zenrow.total_req_count = parseInt(zenrow.total_req_count) + 1 + "";
+  //     await zenrow.save();
+  //   });
 
   console.log("starting to execute ScrapingAnt");
   const options = {
@@ -145,6 +145,7 @@ async function fetchDataAndSave() {
       ScrapingAnt.status_code_arr.push({
         code: response.status,
         id: ScrapingAnt.total_req_count,
+        createdAt: Date.now,
       });
       await ScrapingAnt.save();
     }
@@ -153,23 +154,23 @@ async function fetchDataAndSave() {
     let ScrapingAnt = await ApiMetrix.findOne({ name: "ScrapingAnt" });
     ScrapingAnt.total_req_count =
       parseInt(ScrapingAnt.total_req_count) + 1 + "";
+    ScrapingAnt.status_code_arr.push({
+      code: response?.status,
+      id: ScrapingAnt.total_req_count,
+      createdAt: Date.now,
+    });
     await ScrapingAnt.save();
   }
   console.log("ScrapingAnt executed successfully");
 }
 
 app.get("/get", async (req, res) => {
-  const apiResponse = await ApiResponse.find({});
+  const apiResponse = await ApiResponseScrapingAnt.find({});
   // console.log(apiResponse);
   return res.json({ apiResponse });
 });
 app.get("/get/scrapingant", async (req, res) => {
   const apiResponse = await ApiResponseScrapingAnt.find({});
-  // console.log(apiResponse);
-  return res.json({ apiResponse });
-});
-app.get("/get/zenrows", async (req, res) => {
-  const apiResponse = await ApiResponseZenrows.find({});
   // console.log(apiResponse);
   return res.json({ apiResponse });
 });
